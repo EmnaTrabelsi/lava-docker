@@ -105,7 +105,7 @@ def main():
     else:
         masters = workers["masters"]
     for master in masters:
-        keywords_master = [ "name", "type", "host", "users", "groups", "tokens", "webadmin_https", "persistent_db", "zmq_auth", "zmq_auth_key", "zmq_auth_key_secret", "http_fqdn", "slave_keys", "slaveenv", "loglevel", "allowed_hosts", "lava-coordinator", "healthcheck_url" ]
+        keywords_master = [ "name", "type", "host", "users", "groups", "tokens", "webadmin_https", "persistent_db", "zmq_auth", "zmq_auth_key", "zmq_auth_key_secret", "http_fqdn", "slave_keys", "slaveenv", "loglevel", "allowed_hosts", "lava-coordinator", "healthcheck_url", "artifactorial" ]
         for keyword in master:
             if not keyword in keywords_master:
                 print("WARNING: unknown keyword %s" % keyword)
@@ -140,6 +140,13 @@ def main():
             dockcomp["volumes"] = {}
             dockcomp["volumes"][pg_volume_name] = {}
             dockcomp["volumes"]["lava_job_output"] = {}
+        if "artifactorial" in master and master["artifactorial"]:
+            dockcomp["services"]["artifactorial"] = {}
+            dockcomp["services"]["artifactorial"]["ports"] = ["8000:8000"]
+            dockcomp["services"]["artifactorial"]["build"] = {}
+            dockcomp["services"]["artifactorial"]["build"]["context"] = "artifactorial"
+            dockcomp["services"]["artifactorial"]["volumes"] = ["/local_directory:/local_directory"]
+            shutil.copytree("artifactorial", "output/%s/artifactorial" % host)
         with open(dockcomposeymlpath, 'w') as f:
             yaml.dump(dockcomp, f)
 
