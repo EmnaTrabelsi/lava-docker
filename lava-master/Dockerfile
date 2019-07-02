@@ -1,4 +1,6 @@
-FROM baylibre/lava-master-base:2019.03_stretch
+FROM lavasoftware/lava-server:2019.07
+
+RUN apt-get update && apt-get -y install lava-dispatcher sudo
 
 COPY backup /root/backup/
 
@@ -35,6 +37,9 @@ COPY lava_http_fqdn /root/
 COPY env/ /etc/lava-server/dispatcher.d/
 
 COPY apache2/ /etc/apache2/
+
+# Fixes 'postgresql ERROR:  invalid locale name: "en_US.UTF-8"' when restoring a backup
+RUN echo "en_US.UTF-8 UTF-8" >> /etc/locale.gen && locale-gen en_US.UTF-8
 
 EXPOSE 3079 5555 5556
 
